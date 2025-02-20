@@ -9,13 +9,15 @@ const app = express()
 
 // rest of the package
 const morgan = require('morgan')
-
+const cookieParser = require('cookie-parser')
+const cors = require('cors')
 
 // Database 
 const connectDB = require('./db/connect')
 
 // Routers
 const authRouter = require('./routes/authRoutes')
+const userRouter = require('./routes/userRoutes')
 
 
 // middleware
@@ -25,13 +27,19 @@ const errorHandlerMiddleware = require('./middleware/error-handler')
 
 app.use(morgan("tiny"))
 app.use(express.json())
+app.use(cookieParser(process.env.JWT_SECRET))
+app.use(express.static('./public'))
+app.use(cors())
 
-
-app.get('/',(req,res)=>{
+app.get('/api/v1',(req,res)=>{
+    // console.log(req.cookies);
+    console.log(req.signedCookies);
+    
     res.send('E-Commerce API')
 })
 
 app.use('/api/v1/auth',authRouter)
+app.use('/api/v1/users',userRouter)
 
 app.use(notFoundMiddleware)
 app.use(errorHandlerMiddleware)

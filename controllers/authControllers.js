@@ -1,7 +1,7 @@
 const User = require('../models/User')
 const {StatusCodes} = require('http-status-codes')
 const CustomError = require('../errors')
-const {createJWT} = require('../utils')
+const {attachCookiesToResponse} = require('../utils')
 
 
 const register = async (req,res)=>{
@@ -20,24 +20,42 @@ const register = async (req,res)=>{
     const user = await User.create({name, email, password, role})
     const tokenUser = {name:user.name, userId:user._id, role:user.role}
 
-    const token = createJWT({payload: tokenUser}) // createJWT method comes from utils under jwt.js, we are passing payload in it.
+    // const token = createJWT({payload: tokenUser}) // createJWT method comes from utils under jwt.js, we are passing payload in it.
 
-    const oneDay = 1000 * 60 * 60 * 24
-
-    //setting the cookie -- we are connecting the token with cookie and sending back as response in the browser
-    res.cookie('token',token,{httpOnly:true, expires:new Date(Date.now() + oneDay)})
-
+   
+    attachCookiesToResponse({res,user:tokenUser})
     res.status(StatusCodes.CREATED).json({user: tokenUser}) // status code for CREATED is 201
 
     
 }
 
 const login = async (req,res)=>{
-    res.send('login user')
+    const {email, password} = req.body
+
+    if(!email || !password){
+        throw new CustomError.BadRequestError("Please provide email and passsword") //error code 400     
+    }
+    const user = await User.findOne({email})
+
+    if(!user){
+        throw new CustomError.UnauthenticatedError('Invalid Credentials')
+    }
+
+    const isPasswordCorrect = await user.comparePassword(password)
+    if(!isPasswordCorrect){
+        throw new CustomError.UnauthenticatedError("Invalid Credentials")
+    }
+    const tokenUser = {name: user.name, userId: user._id, role: user.role}
+    attachCookiesToResponse({res, user: tokenUser})
+    res.status(StatusCodes.CREATED).json({user: tokenUser}) // status code 201
 }
 
 const logout = async (req,res)=>{
-    res.send('logout user')
+    res.cookie('token','logout',{
+        httpOnly: true,
+        expires: new Date(Date.now() )
+    })
+    res.status(StatusCodes.OK).json({msg:"user logged out!"})
 }
 
 module.exports = {
