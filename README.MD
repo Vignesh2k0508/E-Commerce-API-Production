@@ -16,7 +16,7 @@
 #### Basic Routes and Middleware
 
 - [x] setup / GET Route
-- [x] setup express.json() middleware
+- [x] setup express.json() middleware.
 - [x] setup 404 and errorHandler middleware
 - [x] import 'exress-async-errors' package
 
