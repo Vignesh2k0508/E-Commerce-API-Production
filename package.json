@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
   "author": "",
   "license": "ISC",
@@ -16,7 +17,7 @@
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
     "express-fileupload": "^1.2.1",
-    "express-mongo-sanitize": "^2.1.0",
+    "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^5.4.1",
     "helmet": "^4.6.0",
     "http-status-codes": "^2.1.4",
@@ -33,6 +34,5 @@
   "engines": {
     "node": "14.x"
   },
-  "proxy":"http://localhost:5000"
-  
+  "proxy": "http://localhost:5000"
 }
